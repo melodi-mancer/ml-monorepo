@@ -5,7 +5,8 @@ RUN apt-get update && \
     	r-cran-plumber \
     	r-cran-jsonlite \
     	r-cran-dplyr \
-    	r-cran-stringr
+    	r-cran-stringr \
+      r-cran-rcpp
 
 RUN R -e 'install.packages("here")'
 

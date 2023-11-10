@@ -1,6 +1,5 @@
 #plumber.R
 library(plumber)
-install.packages("Rcpp")
 
 generate_random_text <- function(length) {
   # Define the character set
