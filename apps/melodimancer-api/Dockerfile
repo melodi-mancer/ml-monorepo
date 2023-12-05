@@ -6,9 +6,15 @@ RUN apt-get update && \
     	r-cran-jsonlite \
     	r-cran-dplyr \
     	r-cran-stringr \
-      r-cran-rcpp
+		r-cran-lavaan \
+		r-cran-jsonlite \
+		r-cran-corrplot \
+		r-cran-ggplot2 \
+		r-cran-psych \
+		r-cran-tidyr \
+        r-cran-rcpp
 
-RUN R -e 'install.packages("here")'
+RUN R -e 'install.packages(c("gridExtra"))'
 
 COPY api_definition.R /
 

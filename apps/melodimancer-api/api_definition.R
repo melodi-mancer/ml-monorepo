@@ -1,6 +1,10 @@
 # Install and load the plumber library
 # install.packages("plumber")
-{library(plumber)
+# install.packages("Rcpp")
+
+{
+  library(Rcpp)
+  library(plumber)
   library(jsonlite)
   library(lavaan)
   library(corrplot)
@@ -8,7 +12,7 @@
   library(psych)
   library(tidyr)
   library(gridExtra)
-  library(spotifyr)
+  #library(spotifyr)
 }
 
 # Custom functions
