@@ -26,15 +26,15 @@
   # F2 turns F1 output into summary statistics as R table and JSON
   F2_summary_table <- function(df1) {
     component_names <- c(
-      "Acousticness",
-      "Danceability",
-      "Liveness",
-      "Instrumentalness",
-      "Energy",
-      "Loudness",
-      "Speechiness",
-      "Tempo",
-      "Valence"
+      "acousticness",
+      "danceability",
+      "liveness",
+      "instrumentalness",
+      "energy",
+      "loudness",
+      "speechiness",
+      "tempo",
+      "valence"
     )
     
     summary_table <- data.frame(
