@@ -14,7 +14,8 @@
     "publish": "lerna publish --no-private",
     "release": "run-s test build publish",
     "dep:check": "check-dependency-version-consistency .",
-    "app:ml-webapp": "yarn workspace @melodimancer/webapp"
+    "app:webapp": "yarn workspace @melodimancer/webapp",
+    "app:r-api": "yarn workspace @melodimancer/r-api"
   },
   "devDependencies": {
     "check-dependency-version-consistency": "^4.1.0",

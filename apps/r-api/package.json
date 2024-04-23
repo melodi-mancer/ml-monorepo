@@ -4,10 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "docker:stop": "docker container stop npm_d",
-    "docker:remove": "docker container rm npm_d",
-    "docker:build": "docker build -t npm_docker .",
-    "docker:run:dev": "docker run -p 4005:4005 -d -v %cd%:/usr/src/app --name npm_d npm_docker",
+    "docker:stop": "docker container stop ml-r-api",
+    "docker:remove": "docker container rm ml-r-api",
+    "docker:build": "docker build -t ml-r-api-image .",
+    "docker:run:dev": "docker run -p 8000:8000 -d -v %cd%:/usr/src/app --name ml-r-api ml-r-api-image",
     "docker:run": "npm run docker:stop & npm run docker:remove & npm run docker:build && npm run docker:run:dev"
   },
   "dependencies": {},

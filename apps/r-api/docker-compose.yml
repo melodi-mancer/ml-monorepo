@@ -1,0 +1,12 @@
+services:
+  api:
+    image: melodimancer-api
+    container_name: api
+    build: .
+    ports:
+      - '8000:8000'
+    develop:
+      watch:
+        - action: sync+restart
+          path: api_definition.R
+          target: ./api_definition.R
