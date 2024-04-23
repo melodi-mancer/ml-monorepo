@@ -1,0 +1,28 @@
+{
+  "targetDefaults": {
+    "build": {
+      "cache": true,
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "{projectRoot}/dist"
+      ]
+    },
+    "dev": {
+      "cache": true,
+      "dependsOn": [
+        "^dev"
+      ]
+    },
+    "generate": {
+      "dependsOn": []
+    },
+    "preview": {
+      "dependsOn": []
+    },
+    "postinstall": {
+      "dependsOn": []
+    }
+  }
+}

@@ -1,0 +1,38 @@
+.header {
+  display: flex;
+  flex-direction: column;
+  column-gap: 4px;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  user-select: none;
+  .title {
+    height: 45px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    column-gap: 4px;
+    margin-bottom: 0;
+    .logo {
+      height: 4rem;
+      width: 4rem;
+      background: no-repeat;
+      background-position: center;
+      background-image: url('/icon/melodimancer-logo.svg');
+      background-size: 4rem;
+    }
+  }
+  .secondary {
+    display: flex;
+    small {
+      font-size: 0.7rem;
+      padding: 0;
+      margin: 0;
+    }
+  }
+  .logout {
+    padding-top: 20px;
+  }
+}

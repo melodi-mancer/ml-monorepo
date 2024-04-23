@@ -1,0 +1,31 @@
+{
+  "name": "@melodimancer/webapp",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "dependencies": {
+    "@pinia/nuxt": "^0.5.1",
+    "@spotify/web-api-ts-sdk": "^1.2.0",
+    "nuxt": "^3.11.1",
+    "pinia": "^2.1.7",
+    "sass": "^1.74.1",
+    "vue": "^3.4.21",
+    "vue-json-pretty": "^2.4.0",
+    "vue-router": "^4.3.0"
+  },
+  "devDependencies": {
+    "@nuxt/eslint": "^0.3.7",
+    "@pinia-plugin-persistedstate/nuxt": "^1.2.0",
+    "eslint": "^9.0.0",
+    "typescript": "^5.4.5"
+  }
+}

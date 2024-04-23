@@ -1,0 +1,24 @@
+{
+  "name": "@melodimancer/monorepo",
+  "private": true,
+  "workspaces": [
+    "./apps/**",
+    "./libs/**"
+  ],
+  "scripts": {
+    "lint": "lerna run lint --parallel",
+    "lint:fix": "lerna run lint:fix --parallel",
+    "dev": "lerna run dev --parallel",
+    "build": "lerna run build --parallel",
+    "test": "lerna run test --parallel",
+    "publish": "lerna publish --no-private",
+    "release": "run-s test build publish",
+    "dep:check": "check-dependency-version-consistency .",
+    "app:ml-webapp": "yarn workspace @melodimancer/webapp"
+  },
+  "devDependencies": {
+    "check-dependency-version-consistency": "^4.1.0",
+    "lerna": "^8.1.2",
+    "npm-run-all": "^4.1.5"
+  }
+}
