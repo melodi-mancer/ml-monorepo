@@ -1,0 +1,15 @@
+{
+  "name": "@melodimancer/r-api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "docker:stop": "docker container stop npm_d",
+    "docker:remove": "docker container rm npm_d",
+    "docker:build": "docker build -t npm_docker .",
+    "docker:run:dev": "docker run -p 4005:4005 -d -v %cd%:/usr/src/app --name npm_d npm_docker",
+    "docker:run": "npm run docker:stop & npm run docker:remove & npm run docker:build && npm run docker:run:dev"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
