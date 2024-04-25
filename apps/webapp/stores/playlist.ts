@@ -1,4 +1,4 @@
-import type { Track, Playlist } from '@spotify/web-api-ts-sdk'
+import type { Track, Playlist, AudioFeatures } from '@spotify/web-api-ts-sdk'
 import { useUserDataStore } from './userData'
 import type { CfaClient } from '#imports'
 
@@ -104,10 +104,46 @@ const onlyNew: PlaylistFilterFunction = async ({
   )
 }
 
+const trackAnalysis: PlaylistFilterFunction = async ({
+  recommendationsStore,
+  userDataStore,
+  cfa
+}) => {
+  const factor = recommendationsStore.factor
+  const profile = userDataStore.statisticalAnalysis.filter(
+    (r) => r[factor as TrackAnalysisColumns]
+  ).reduce((acc, cur) => {
+    return {
+      ...acc,
+      [cur._row]: cur[factor as TrackAnalysisColumns],
+    }
+  }, {} as Record<AudioFeaturesProps, number>)
+  const tracks: Array<TrackAnalysisTrack> = recommendationsStore.recommendations.map((track) => {
+    const audio_features = recommendationsStore.recommendationsAudioFeatures.find((af) => af.id === track.id) ?? {} as AudioFeatures
+    return {
+      trackId: track.id,
+      ...{
+        danceability: audio_features?.danceability ?? 0,
+        energy: audio_features?.energy ?? 0,
+        loudness: audio_features?.loudness ?? 0,
+        speechiness: audio_features?.speechiness ?? 0,
+        acousticness: audio_features?.acousticness ?? 0,
+        instrumentalness: audio_features?.instrumentalness ?? 0,
+        liveness: audio_features?.liveness ?? 0,
+        valence: audio_features?.valence ?? 0,
+        tempo: audio_features?.tempo ?? 0,
+      }
+    }
+  })
+  const trackIds = await cfa.getSortedTracksAnalysis({ profile, tracks })
+  return trackIds.map((id) => recommendationsStore.recommendations.find((t) => t.id === id) as Track) 
+}
+
 const PlaylistFilters: PlaylistFiltersObject = {
   default: async ({ recommendationsStore }) =>
     recommendationsStore.recommendations,
   onlyNew,
+  trackAnalysis,
 }
 
 export const PlaylistFiltersKeys = Object.keys(PlaylistFilters)

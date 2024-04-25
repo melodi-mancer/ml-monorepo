@@ -1,6 +1,6 @@
 import type { AudioFeatures } from '@spotify/web-api-ts-sdk'
 
-type AudioFeaturesProps =
+export type AudioFeaturesProps =
   | 'danceability'
   | 'energy'
   | 'loudness'
@@ -13,12 +13,20 @@ type AudioFeaturesProps =
 
 type TrackAnalysisAudioFeatures = Pick<AudioFeatures, AudioFeaturesProps>
 
+export type TrackAnalysisTrack = {
+  trackId: string
+  danceability: number
+  energy: number
+  loudness: number
+  speechiness: number
+  acousticness: number
+  instrumentalness: number
+  liveness: number
+  valence: number
+  tempo: number
+}
+
 export type TrackAnalysisColumns =
-  | 'RC1'
-  | 'RC2'
-  | 'RC3'
-  | 'RC4'
-  | 'PC1'
   | 'new_RC1'
   | 'new_RC2'
   | 'new_RC3'
@@ -30,11 +38,6 @@ export type TrackAnalysisRow = {
 } & Record<TrackAnalysisColumns, number>
 
 export const trackAnalysisOptions: Array<TrackAnalysisColumns> = [
-  'RC1',
-  'RC2',
-  'RC3',
-  'RC4',
-  'PC1',
   'new_RC1',
   'new_RC2',
   'new_RC3',
@@ -62,6 +65,24 @@ export class CfaClient {
     })
       .then<{ profile_cfa: Array<TrackAnalysisRow> }>((res) => res.json())
       .then<Array<TrackAnalysisRow>>((res) => res.profile_cfa)
+  }
+
+  getSortedTracksAnalysis({ profile, tracks }: { profile: Record<AudioFeaturesProps, number>; tracks: Array<TrackAnalysisTrack> }) {
+    const request = {
+      data: {
+        profile,
+        tracks,
+      },
+    }
+    return fetch(`${this.baseUrl}/z_scored_lists`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(request),
+    })
+      .then<Array<{ trackId: string, rownumbers: number }>>((res) => res.json())
+      .then((res) => res.map(item => item.trackId))
   }
 
   mapAudioFeaturesToTrackAnalysis(
