@@ -1,7 +1,7 @@
 services:
   api:
-    image: melodimancer-api
-    container_name: api
+    image: melodimancer-r-api
+    container_name: r-api
     build: .
     ports:
       - '8000:8000'
