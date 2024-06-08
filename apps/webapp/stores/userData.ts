@@ -4,6 +4,7 @@ import type { SpotifyTimeRanges } from '~/utils/SpotifyClient'
 
 export interface UserDataState {
   userId: string
+  userEmail: string
   timeRange: SpotifyTimeRanges
   topTracks: Array<Track>
   topArtists: Array<Artist>
@@ -20,6 +21,7 @@ export const useUserDataStore = defineStore('userData', {
   state: (): UserDataState => {
     return {
       userId: '',
+      userEmail: '',
       timeRange: 'short_term',
       topTracks: [],
       topArtists: [],
@@ -28,6 +30,9 @@ export const useUserDataStore = defineStore('userData', {
     }
   },
   getters: {
+    isAdmin: (state) => {
+      return isAdmin(state.userEmail)
+    },
     isPopulated: (state) =>
       state.topTracks.length > 0 &&
       state.topArtists.length > 0 &&
@@ -57,13 +62,19 @@ export const useUserDataStore = defineStore('userData', {
     },
   },
   actions: {
+    async populateUserInfo() {
+      const nuxt = useNuxtApp()
+      const userData = await nuxt.$spotify.getProfile()
+      this.userId = userData.id
+      this.userEmail = userData.email
+    },
     async getUserData(timeRange?: SpotifyTimeRanges, pages?: number) {
       const nuxt = useNuxtApp()
       if (timeRange) {
         this.timeRange = timeRange
       }
       if (!this.userId) {
-        this.userId = (await nuxt.$spotify.getProfile()).id
+        await this.populateUserInfo()
       }
       this.topTracks = await nuxt.$spotify.getAllUserTopTracks(
         this.timeRange,

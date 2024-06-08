@@ -3,7 +3,7 @@ const props = defineProps<{
   title: string
   seedType: SeedTypes
 }>()
-
+const layout = inject('layout') as AvailableLayouts | undefined
 const userDataStore = useUserDataStore()
 const recommendationsStore = useRecommendationsStore()
 
@@ -31,7 +31,7 @@ watch(selected, (newValue) => {
 
 async function handleRecommendationClick() {
   await recommendationsStore.getRecommendations({ seedType: props.seedType })
-  navigateTo('/app/view-recommendations')
+  navigateTo(buildAppUrl('/app/view-recommendations', layout))
 }
 </script>
 

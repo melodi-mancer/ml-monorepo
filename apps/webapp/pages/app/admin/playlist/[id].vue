@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
-  layout: 'authenticated',
+  layout: 'admin',
   middleware: ['user-data-populated'],
 })
 
@@ -15,7 +15,9 @@ const playlist = computed(() =>
 
 <template>
   <div>
-    <NuxtLink to="/app/view-recommendations">Back to recommendations</NuxtLink>
+    <NuxtLink to="/app/admin/view-recommendations"
+      >Back to recommendations</NuxtLink
+    >
     <div v-if="playlist">
       <h1>Playlist: {{ playlist.name }}</h1>
       <h2>

@@ -15,12 +15,16 @@ export const useAuthStore = defineStore('auth', {
     async authenticate() {
       const nuxt = useNuxtApp()
       const router = useRouter()
+      const userDataStore = useUserDataStore()
       try {
         const response = await nuxt.$spotify.authenticate()
         this.accessToken = response.accessToken.access_token
         this.isAuthenticated = response.authenticated
-        if (this.isAuthenticated) {
+        await userDataStore.populateUserInfo()
+        if (this.isAuthenticated && !userDataStore.isAdmin) {
           router.push('/app')
+        } else if (this.isAuthenticated && userDataStore.isAdmin) {
+          router.push('/app/admin')
         }
       } catch (err) {
         console.error(err)

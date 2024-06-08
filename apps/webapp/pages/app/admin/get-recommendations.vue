@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
-  layout: 'authenticated',
+  layout: 'admin',
   middleware: ['user-data-populated'],
 })
 
@@ -9,7 +9,7 @@ const userDataStore = useUserDataStore()
 
 <template>
   <div>
-    <NuxtLink to="/app">Back to app</NuxtLink>
+    <NuxtLink to="/app/admin">Back to app</NuxtLink>
     <div v-if="userDataStore.isPopulated" class="stats-container">
       <ModuleStatisticalAnalysisTable
         name="user-data"
