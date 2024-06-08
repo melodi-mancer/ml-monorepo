@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
-  layout: 'authenticated',
+  layout: 'admin',
 })
 const userDataStore = useUserDataStore()
 const userDataAction = computed(() =>
@@ -38,7 +38,9 @@ async function handleGetUserDataClick() {
       @click="handleGetUserDataClick"
     />
     <div>
-      <NuxtLink v-if="userDataStore.isPopulated" to="/app/get-recommendations"
+      <NuxtLink
+        v-if="userDataStore.isPopulated"
+        to="/app/admin/get-recommendations"
         >Get Recommendations</NuxtLink
       >
     </div>

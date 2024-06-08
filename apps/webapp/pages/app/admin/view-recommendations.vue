@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
-  layout: 'authenticated',
+  layout: 'admin',
   middleware: ['user-data-populated'],
 })
 
@@ -9,7 +9,7 @@ const recommendationsStore = useRecommendationsStore()
 
 <template>
   <div>
-    <NuxtLink to="/app/get-recommendations">Back to app</NuxtLink>
+    <NuxtLink to="/app/admin/get-recommendations">Back to app</NuxtLink>
     <div>
       <h2>Payload:</h2>
       <VueJsonPretty

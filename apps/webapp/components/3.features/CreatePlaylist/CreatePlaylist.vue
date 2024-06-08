@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const layout = inject('layout') as AvailableLayouts | undefined
 const playlistStore = usePlaylistStore()
 const playlistName = ref('')
 const runTime = ref(0)
@@ -12,7 +13,7 @@ async function handleGeneratePlaylistClick() {
     algorithm: algorithm.value,
   })
   console.log('playlistId: ', playlistId)
-  navigateTo(`/app/playlist/${playlistId}`)
+  navigateTo(buildAppUrl(`/app/playlist/${playlistId}`, layout))
 }
 </script>
 

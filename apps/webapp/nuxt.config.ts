@@ -29,6 +29,7 @@ export default defineNuxtConfig({
       spotifyRedirectUrl: process.env.SPOTIFY_REDIRECT_URL ?? '',
       cfaApiUrl: process.env.CFA_API_URL ?? '',
       generatePlaylist: process.env.GENERATE_PLAYLIST === 'true',
+      adminEmails: process.env.ADMIN_EMAILS?.split(',') ?? [],
       appVersion: pkg.version,
     },
   },
