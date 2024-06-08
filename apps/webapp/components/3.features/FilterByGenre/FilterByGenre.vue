@@ -2,13 +2,13 @@
 const userDataStore = useUserDataStore()
 
 const genre = ref<string>('')
-const options = userDataStore.getArtistsGenres()
+const options = computed(() => userDataStore.getArtistsGenres())
 
 async function handleGenerateAnalysisClick() {
   await userDataStore.getStatisticalAnalysis('byGenre', genre.value)
 }
 async function handleGenerateAnalysisForTopGenresClick() {
-  await userDataStore.getStatisticalAnalysis('byGenre', options)
+  await userDataStore.getStatisticalAnalysis('byGenre', options.value)
 }
 </script>
 
