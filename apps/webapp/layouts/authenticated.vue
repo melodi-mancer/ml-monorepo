@@ -1,3 +1,7 @@
+<script setup>
+provide('layout', 'authenticated')
+</script>
+
 <template>
   <div class="page-container">
     <div class="top">
