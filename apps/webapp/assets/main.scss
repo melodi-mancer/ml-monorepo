@@ -67,7 +67,11 @@ body {
 }
 
 a {
-    color: yellow;
+    color: rgb(250, 133, 8);
+}
+
+.authentic {
+    text-align: center;
 }
 
 .page-container {
@@ -119,8 +123,12 @@ a {
                     padding: .3rem;
                     border: 1px solid #1db954;
                 }
+
+                    
             }
         }
+
+        
 
         .results-container {
             height: 100%;
