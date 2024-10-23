@@ -30,7 +30,7 @@ $font-sans: sans-serif;
 }
 @mixin spoti-button() {
     background-color: #1db954;
-    color: #191414;
+    color: #0e0707;
     text-decoration: none;
     padding: 10px 30px;
     border: none;
@@ -56,8 +56,8 @@ html {
 body {
     height: 100%;
     width: 100%;
-    background-color: #191414;
-    color: #1db954;
+    background-color: #ffffff;
+    color: #000000;
     font-family: $font-mont;
     font-weight: 400;
 }
@@ -67,7 +67,11 @@ body {
 }
 
 a {
-    color: yellow;
+    color: rgb(250, 133, 8);
+}
+
+.authentic {
+    text-align: center;
 }
 
 .page-container {
@@ -84,6 +88,18 @@ a {
         flex-direction: column;
         justify-content: center;
         align-items: center;
+    }
+
+    .top2 {
+        @media (max-width: 700px) {
+            margin-top: 5%;
+        }
+        margin-top: 3%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background-color: #fff;
     }
 
     .main {
@@ -107,8 +123,12 @@ a {
                     padding: .3rem;
                     border: 1px solid #1db954;
                 }
+
+                    
             }
         }
+
+        
 
         .results-container {
             height: 100%;
