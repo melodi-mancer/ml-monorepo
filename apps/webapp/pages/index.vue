@@ -7,11 +7,15 @@ async function handleLoginClick() {
     console.log(err)
   }
 }
+
+definePageMeta({
+  layout: 'start',
+})
 </script>
 
 <template>
   <div class="page-container">
-    <div class="main">
+    <div class="mainStart">
       <ElButton title="Log in" @click.native="handleLoginClick" />
     </div>
   </div>

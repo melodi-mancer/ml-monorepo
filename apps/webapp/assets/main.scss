@@ -635,7 +635,19 @@ a {
             }
         }
     }
+
+    .mainStart{
+        height: 100%;
+        width: 100%;
+        margin-top: 5%;
+        margin-bottom: 5rem;
+        display: flex;
+        justify-content: center;
+        
+    }
 }
+
+
 
 .bottom {
     display: block;
