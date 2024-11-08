@@ -48,8 +48,9 @@ export const usePlaylistStore = defineStore('playlist', {
         )
         const playlist = await nuxt.$spotify.createPlaylist({
           profileId: userDataStore.userId,
-          trackUris: selectedTracks.map((t) => t.id),
+          trackUris: selectedTracks.map((t) => "spotify:track:" + t.id),
           generatePlaylist: config.public.generatePlaylist,
+          name: name,
         })
         this.playlists.push({
           id: playlist.id,
