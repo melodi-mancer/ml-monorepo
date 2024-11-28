@@ -20,7 +20,8 @@
     "sass": "^1.74.1",
     "vue": "^3.4.21",
     "vue-json-pretty": "^2.4.0",
-    "vue-router": "^4.3.0"
+    "vue-router": "^4.3.0",
+    "vuetify-nuxt-module": "0.18.3"
   },
   "devDependencies": {
     "@nuxt/eslint": "^0.3.7",

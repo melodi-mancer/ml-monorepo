@@ -22,7 +22,18 @@ export default defineNuxtConfig({
       prefix: 'Feature',
     },
   ],
-  modules: ['@pinia/nuxt', '@pinia-plugin-persistedstate/nuxt', '@nuxt/eslint'],
+  modules: [
+    '@pinia/nuxt',
+    '@pinia-plugin-persistedstate/nuxt',
+    '@nuxt/eslint',
+    'vuetify-nuxt-module',
+  ],
+  vuetify: {
+    moduleOptions: {
+      /* module specific options */
+    },
+    vuetifyOptions: './vuetify.config.ts',
+  },
   runtimeConfig: {
     public: {
       spotifyClientId: process.env.SPOTIFY_CLIENT_ID ?? '',
