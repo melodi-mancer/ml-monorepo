@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import Admin from '~/layouts/admin.vue';
 
 definePageMeta({
   layout: 'authenticated',
