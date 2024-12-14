@@ -21,11 +21,9 @@ export const useAuthStore = defineStore('auth', {
         this.accessToken = response.accessToken.access_token
         this.isAuthenticated = response.authenticated
         await userDataStore.populateUserInfo()
-        if (this.isAuthenticated && !userDataStore.isAdmin) {
-          router.push('/app')
-        } else if (this.isAuthenticated && userDataStore.isAdmin) {
-          router.push('/app/admin')
-        }
+        await userDataStore.getUserData()
+        await userDataStore.getStatisticalAnalysis('default')
+        router.push('/app')
       } catch (err) {
         console.error(err)
       }

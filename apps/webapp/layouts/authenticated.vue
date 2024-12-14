@@ -1,5 +1,6 @@
 <script setup>
 const appSettingsStore = useAppSettingsStore()
+const auth = useAuthStore()
 provide('layout', 'authenticated')
 
 const drawer = ref(false)
@@ -55,7 +56,12 @@ const toggleDrawer = () => (drawer.value = !drawer.value)
         <vDivider />
       </ElIsAdmin>
       <vList density="comfortable">
-        <vListItem prepend-icon="mdi-power" title="Logout" value="logout" />
+        <vListItem
+          prepend-icon="mdi-power"
+          title="Logout"
+          value="logout"
+          @click="auth.logOut()"
+        />
       </vList>
     </template>
   </vNavigationDrawer>
