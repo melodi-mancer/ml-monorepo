@@ -1,8 +1,8 @@
-import {
+import type {
   SpotifyApi,
-  type Artist,
-  type RecommendationsRequest,
-  type Track,
+  Artist,
+  RecommendationsRequest,
+  Track,
 } from '@spotify/web-api-ts-sdk'
 
 export type { Track, Artist, RecommendationsRequest }
@@ -12,6 +12,16 @@ export type SpotifyTimeRanges =
   | 'medium_term'
   | 'long_term'
   | undefined
+
+type SearchTrack = {
+  itemType: 'track'
+} & Track
+
+type SearchArtist = {
+  itemType: 'artist'
+} & Artist
+
+export type SearchItem = SearchTrack | SearchArtist
 
 export class SpotifyClient {
   public client: SpotifyApi
@@ -118,6 +128,28 @@ export class SpotifyClient {
 
   addTracksToPlaylist(playlistId: string, tracksUris: Array<string>) {
     return this.client.playlists.addItemsToPlaylist(playlistId, tracksUris)
+  }
+
+  async searchTracksAndArtists(search: string): Promise<SearchItem[]> {
+    const [tracksResult, artistsResult] = await Promise.all([
+      this.client.search(`track:${search}`, ['track'], undefined, 5),
+      this.client.search(`artist:${search}`, ['artist'], undefined, 5),
+    ])
+    const tracks = tracksResult.tracks.items.map((track) => ({
+      itemType: 'track',
+      ...track,
+    })) as SearchTrack[]
+    const artists = artistsResult.artists.items.map((artist) => ({
+      itemType: 'artist',
+      ...artist,
+    })) as SearchArtist[]
+    return [...artists, ...tracks].filter((obj, index, arr) => {
+      return (
+        arr.findIndex((o) => {
+          return o.id === obj.id
+        }) === index
+      )
+    })
   }
 
   // Helpers

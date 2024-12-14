@@ -8,6 +8,8 @@ import type {
 } from '@spotify/web-api-ts-sdk'
 
 export interface RecommendationsState {
+  userSelectedSeed: SearchItem | null
+  adminSelectedSeeds: Array<SearchItem>
   useFactor: boolean
   threshold?: number
   factor?: TrackAnalysisColumns
@@ -19,10 +21,12 @@ export interface RecommendationsState {
   recommendationsAudioFeatures: Array<AudioFeatures>
 }
 
-export type SeedTypes = 'track' | 'artist' | 'genre'
+type AdminSeedTypes = 'track' | 'artist' | 'genre'
+
+export type SeedTypes = 'userSelection' & AdminSeedTypes
 
 const seedMapping: Record<
-  SeedTypes,
+  AdminSeedTypes,
   keyof Pick<RecommendationsState, 'tracksIds' | 'artistsIds' | 'genres'>
 > = {
   track: 'tracksIds',
@@ -30,17 +34,24 @@ const seedMapping: Record<
   genre: 'genres',
 }
 
+const initialState: RecommendationsState = {
+  userSelectedSeed: null,
+  // Admin functionality
+  adminSelectedSeeds: [],
+  useFactor: false,
+  threshold: undefined,
+  factor: undefined,
+  tracksIds: [],
+  artistsIds: [],
+  genres: [],
+  payload: undefined,
+  recommendations: [],
+  recommendationsAudioFeatures: [],
+}
+
 export const useRecommendationsStore = defineStore('recommendations', {
   state: (): RecommendationsState => ({
-    useFactor: false,
-    threshold: undefined,
-    factor: undefined,
-    tracksIds: [],
-    artistsIds: [],
-    genres: [],
-    payload: undefined,
-    recommendations: [],
-    recommendationsAudioFeatures: [],
+    ...initialState,
   }),
   getters: {
     getRecommendationsWithAudioFeatures(state) {
@@ -84,6 +95,15 @@ export const useRecommendationsStore = defineStore('recommendations', {
             return { seed_artists: state[seedMapping[seedType]] }
           case 'genre':
             return { seed_genres: state[seedMapping[seedType]] }
+          case 'userSelection': {
+            const key =
+              state.userSelectedSeed?.itemType === 'track'
+                ? 'seed_tracks'
+                : 'seed_artists'
+            return { [key]: [state.userSelectedSeed?.id] }
+          }
+          default:
+            return {}
         }
       }
     },
@@ -108,7 +128,11 @@ export const useRecommendationsStore = defineStore('recommendations', {
         console.error(err)
       }
     },
-    updateSeed(seedType: SeedTypes, items: Array<string> | string) {
+    setUserSelectedSeed(seed: SearchItem | null) {
+      this.userSelectedSeed = seed
+    },
+    // Admin functionality
+    updateSeed(seedType: AdminSeedTypes, items: Array<string> | string) {
       if (Array.isArray(items)) {
         this[seedMapping[seedType]] = items
       } else {
@@ -126,6 +150,19 @@ export const useRecommendationsStore = defineStore('recommendations', {
       this.useFactor = useFactor
       this.threshold = threshold
       this.factor = factor
+    },
+    resetRecommendationOptions() {
+      this.userSelectedSeed = initialState.userSelectedSeed
+      this.recommendations = initialState.recommendations
+      this.recommendationsAudioFeatures =
+        initialState.recommendationsAudioFeatures
+      this.payload = initialState.payload
+      this.useFactor = initialState.useFactor
+      this.threshold = initialState.threshold
+      this.factor = initialState.factor
+      this.tracksIds = initialState.tracksIds
+      this.artistsIds = initialState.artistsIds
+      this.genres = initialState.genres
     },
   },
   persist: {

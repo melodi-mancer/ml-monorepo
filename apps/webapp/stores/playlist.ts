@@ -42,13 +42,14 @@ export const usePlaylistStore = defineStore('playlist', {
       const userDataStore = useUserDataStore()
       try {
         const filteredTracks = await this.filterTrackList(algorithm)
+        if (!filteredTracks) return
         const selectedTracks = this.selectTracksByRuntime(
           filteredTracks,
           runTime * 60000
         )
         const playlist = await nuxt.$spotify.createPlaylist({
           profileId: userDataStore.userId,
-          trackUris: selectedTracks.map((t) => "spotify:track:" + t.id),
+          trackUris: selectedTracks.map((t) => 'spotify:track:' + t.id),
           generatePlaylist: config.public.generatePlaylist,
           name: name,
         })
@@ -67,7 +68,7 @@ export const usePlaylistStore = defineStore('playlist', {
       const userDataStore = useUserDataStore()
       const recommendationsStore = useRecommendationsStore()
       const nuxt = useNuxtApp()
-      return PlaylistFilters[algorithm]({
+      return PlaylistFilters[algorithm]?.({
         userDataStore,
         recommendationsStore,
         cfa: nuxt.$cfa,
@@ -108,36 +109,43 @@ const onlyNew: PlaylistFilterFunction = async ({
 const trackAnalysis: PlaylistFilterFunction = async ({
   recommendationsStore,
   userDataStore,
-  cfa
+  cfa,
 }) => {
   const factor = recommendationsStore.factor
-  const profile = userDataStore.statisticalAnalysis.filter(
-    (r) => r[factor as TrackAnalysisColumns]
-  ).reduce((acc, cur) => {
-    return {
-      ...acc,
-      [cur._row]: cur[factor as TrackAnalysisColumns],
-    }
-  }, {} as Record<AudioFeaturesProps, number>)
-  const tracks: Array<TrackAnalysisTrack> = recommendationsStore.recommendations.map((track) => {
-    const audio_features = recommendationsStore.recommendationsAudioFeatures.find((af) => af.id === track.id) ?? {} as AudioFeatures
-    return {
-      trackId: track.id,
-      ...{
-        danceability: audio_features?.danceability ?? 0,
-        energy: audio_features?.energy ?? 0,
-        loudness: audio_features?.loudness ?? 0,
-        speechiness: audio_features?.speechiness ?? 0,
-        acousticness: audio_features?.acousticness ?? 0,
-        instrumentalness: audio_features?.instrumentalness ?? 0,
-        liveness: audio_features?.liveness ?? 0,
-        valence: audio_features?.valence ?? 0,
-        tempo: audio_features?.tempo ?? 0,
+  const profile = userDataStore.statisticalAnalysis
+    .filter((r) => r[factor as TrackAnalysisColumns])
+    .reduce((acc, cur) => {
+      return {
+        ...acc,
+        [cur._row]: cur[factor as TrackAnalysisColumns],
       }
-    }
-  })
+    }, {} as Record<AudioFeaturesProps, number>)
+  const tracks: Array<TrackAnalysisTrack> =
+    recommendationsStore.recommendations.map((track) => {
+      const audio_features =
+        recommendationsStore.recommendationsAudioFeatures.find(
+          (af) => af.id === track.id
+        ) ?? ({} as AudioFeatures)
+      return {
+        trackId: track.id,
+        ...{
+          danceability: audio_features?.danceability ?? 0,
+          energy: audio_features?.energy ?? 0,
+          loudness: audio_features?.loudness ?? 0,
+          speechiness: audio_features?.speechiness ?? 0,
+          acousticness: audio_features?.acousticness ?? 0,
+          instrumentalness: audio_features?.instrumentalness ?? 0,
+          liveness: audio_features?.liveness ?? 0,
+          valence: audio_features?.valence ?? 0,
+          tempo: audio_features?.tempo ?? 0,
+        },
+      }
+    })
   const trackIds = await cfa.getSortedTracksAnalysis({ profile, tracks })
-  return trackIds.map((id) => recommendationsStore.recommendations.find((t) => t.id === id) as Track) 
+  return trackIds.map(
+    (id) =>
+      recommendationsStore.recommendations.find((t) => t.id === id) as Track
+  )
 }
 
 const PlaylistFilters: PlaylistFiltersObject = {

@@ -4,7 +4,9 @@ import type { SpotifyTimeRanges } from '~/utils/SpotifyClient'
 
 export interface UserDataState {
   userId: string
+  userName: string
   userEmail: string
+  userImage: string
   timeRange: SpotifyTimeRanges
   topTracks: Array<Track>
   topArtists: Array<Artist>
@@ -21,6 +23,8 @@ export const useUserDataStore = defineStore('userData', {
   state: (): UserDataState => {
     return {
       userId: '',
+      userName: '',
+      userImage: '',
       userEmail: '',
       timeRange: 'short_term',
       topTracks: [],
@@ -52,7 +56,7 @@ export const useUserDataStore = defineStore('userData', {
           state.topTracks.filter((t) => {
             if (!genre) return true
             const artist = state.topArtists.find(
-              (a) => a.id === t.artists[0].id
+              (a) => a.id === t.artists?.[0]?.id
             )
             if (Array.isArray(genre))
               return artist?.genres.some((g) => genre.includes(g))
@@ -66,6 +70,8 @@ export const useUserDataStore = defineStore('userData', {
       const nuxt = useNuxtApp()
       const userData = await nuxt.$spotify.getProfile()
       this.userId = userData.id
+      this.userName = userData.display_name
+      this.userImage = userData.images?.[0]?.url || ''
       this.userEmail = userData.email
     },
     async getUserData(timeRange?: SpotifyTimeRanges, pages?: number) {

@@ -9,24 +9,32 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
+    "prepare": "nuxt prepare",
+    "typecheck": "nuxt typecheck",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "@pinia/nuxt": "^0.5.1",
     "@spotify/web-api-ts-sdk": "^1.2.0",
-    "nuxt": "^3.11.1",
+    "@vite-pwa/nuxt": "0.10.6",
+    "nuxt": "^3.14.1592",
     "pinia": "^2.1.7",
     "sass": "^1.74.1",
-    "vue": "^3.4.21",
+    "vue": "latest",
     "vue-json-pretty": "^2.4.0",
     "vue-router": "^4.3.0",
-    "vuetify-nuxt-module": "0.18.3"
+    "vuetify": "^3.7.3"
   },
   "devDependencies": {
+    "@mdi/font": "^7.4.47",
     "@nuxt/eslint": "^0.3.7",
+    "@nuxt/fonts": "^0.10.2",
     "@pinia-plugin-persistedstate/nuxt": "^1.2.0",
     "eslint": "^9.0.0",
-    "typescript": "^5.4.5"
+    "sass-embedded": "^1.80.3",
+    "typescript": "^5.6.3",
+    "vue-tsc": "^2.1.6",
+    "vuetify-nuxt-module": "0.18.3"
   }
 }

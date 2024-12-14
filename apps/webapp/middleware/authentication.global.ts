@@ -1,6 +1,6 @@
 const publicPages = ['/', '/auth-callback']
 
-export default defineNuxtRouteMiddleware((to, from) => {
+export default defineNuxtRouteMiddleware((to, _) => {
   const authStore = useAuthStore()
   const userDataStore = useUserDataStore()
   if (!authStore.isAuthenticated && to.path.includes('/app')) {

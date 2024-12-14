@@ -3,15 +3,9 @@ provide('layout', 'start')
 </script>
 
 <template>
-  <div class="page-container">
-    <div class="top">
-      <ModuleStartHeader />
-    </div>
-    <div class="main">
+  <vMain>
+    <vContainer height="100%">
       <slot />
-    </div>
-    <div class="bottom">
-      <ModuleFooter />
-    </div>
-  </div>
+    </vContainer>
+  </vMain>
 </template>

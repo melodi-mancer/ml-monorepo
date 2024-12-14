@@ -1,13 +1,36 @@
 import pkg from './package.json'
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  compatibilityDate: '2024-12-01',
+
+  future: {
+    compatibilityVersion: 4,
+  },
+
+  ssr: false,
+
+  // when enabling ssr option you need to disable inlineStyles and maybe devLogs
+  // features: {
+  //   inlineStyles: false,
+  //   devLogs: false,
+  // },
+
+  build: {
+    transpile: ['vuetify'],
+  },
+
+  vite: {
+    ssr: {
+      noExternal: ['vuetify'],
+    },
+  },
   app: {
     head: {
       charset: 'utf-8',
       viewport: 'width=device-width, initial-scale=1',
     },
   },
-  css: ['~/assets/main.scss', 'vue-json-pretty/lib/styles.css'],
+  css: ['~/assets/main.scss'],
   components: [
     {
       path: '~/components/1.elements',
@@ -23,10 +46,12 @@ export default defineNuxtConfig({
     },
   ],
   modules: [
+    'vuetify-nuxt-module',
+    '@nuxt/fonts',
     '@pinia/nuxt',
     '@pinia-plugin-persistedstate/nuxt',
     '@nuxt/eslint',
-    'vuetify-nuxt-module',
+    '@vite-pwa/nuxt',
   ],
   vuetify: {
     moduleOptions: {

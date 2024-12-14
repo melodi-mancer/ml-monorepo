@@ -1,62 +1,109 @@
 <script setup lang="ts">
-import Admin from '~/layouts/admin.vue';
-
+import { getImage, getSubtitle } from '#build/imports'
+const nuxt = useNuxtApp()
+const recommendationsStore = useRecommendationsStore()
+const appSettingsStore = useAppSettingsStore()
 definePageMeta({
   layout: 'authenticated',
 })
-const props = defineProps<{
-  title: string
-  seedType: SeedTypes
-}>()
 
-const userDataStore = useUserDataStore()
-const recommendationsStore = useRecommendationsStore()
+const isLoading = ref(false)
+const items = ref<SearchItem[]>([])
 
-
-const layout = inject('layout') as AvailableLayouts | undefined
-
-async function handleRecommendationClick() {
-  await recommendationsStore.getRecommendations({ seedType: 'track' })
-  navigateTo(buildAppUrl('/app/view-recommendations', layout))
+const search = (search: string) => {
+  if (!search) {
+    items.value = []
+    return
+  }
+  isLoading.value = true
+  nuxt.$spotify
+    .searchTracksAndArtists(search)
+    .then((res) => {
+      items.value = res
+    })
+    .finally(() => {
+      isLoading.value = false
+    })
 }
 
-const timeRange = 'short_term'
-async function test() {
-  try {
-    await userDataStore.getUserData(timeRange)
-  } catch (err) {
-    console.log(err)
+const selectItem = (item: SearchItem) => {
+  if (appSettingsStore.adminUi) {
+    recommendationsStore.getSeedPayload(item)
+  } else {
+    recommendationsStore.setUserSelectedSeed(item)
   }
+}
 
-  let test2 = userDataStore.topTracks[0].id
-  console.log(test2)
-
-  recommendationsStore.tracksIds = []
-  recommendationsStore.updateSeed('track', test2)
-  recommendationsStore.updateFactors({
-    useFactor: 'True',
-    factor: 'new_RC1',
-    threshold:"",
-  })
-
-  
-
-  handleRecommendationClick()
+const confirmSelection = () => {
+  navigateTo(buildAppUrl('/app/set-mood'))
 }
 </script>
 <template>
+  <vRow justify="center" align="center">
+    <vCol cols="12" class="mb-12">
+      <h2 class="text-center">What are you in the mood for today?</h2>
+    </vCol>
+    <vCol cols="12">
+      <vAutocomplete
+        placeholder="Search for a music or artist to start"
+        variant="outlined"
+        density="default"
+        clear-on-select
+        hide-no-data
+        hide-details
+        clearable
+        return-object
+        prepend-inner-icon="mdi-magnify"
+        single-line
+        chips
+        item-value="id"
+        item-title="name"
+        :loading="isLoading"
+        :items="items"
+        :multiple="appSettingsStore.adminUi"
+        :model-value="recommendationsStore.userSelectedSeed"
+        @update:search="search"
+        @update:model-value="selectItem"
+      >
+        <template #chip="{ props, item }">
+          <vChip
+            v-bind="props"
+            :prepend-avatar="getImage(item.raw)"
+            :text="item.raw.name"
+            :color="item.raw.type === 'track' ? undefined : 'primary'"
+          />
+        </template>
 
-<div class="main">
-  <div class="authentic">
-    <h1>Click here to instantly get recommendations</h1>
-    <p>
-      Recommendations will be presented as a playlist that can then be tailored.
-    </p>
-    <ElButton
-      :title="`Get recommendations`"
-      @click="test"
-    />
-  </div>
-</div>
-
+        <template #item="{ props, item }">
+          <vListItem
+            v-bind="props"
+            :prepend-avatar="getImage(item.raw)"
+            :subtitle="getSubtitle(item.raw)"
+            :title="item.raw.name"
+          />
+        </template>
+      </vAutocomplete>
+    </vCol>
+    <ElIsAdmin>
+      <vCol cols="12">
+        <vCombobox
+          placeholder="Try out some genres"
+          variant="outlined"
+          hide-details
+          density="default"
+          multiple
+          chips
+          :items="['pop', 'rock', 'hip-hop', 'jazz', 'classical']"
+        />
+      </vCol>
+    </ElIsAdmin>
+    <vCol cols="12">
+      <vBtn
+        text="Confirm"
+        block
+        :disabled="!recommendationsStore.userSelectedSeed"
+        @click="confirmSelection"
+      />
+    </vCol>
+  </vRow>
 </template>

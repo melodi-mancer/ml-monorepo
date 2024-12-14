@@ -67,7 +67,13 @@ export class CfaClient {
       .then<Array<TrackAnalysisRow>>((res) => res.profile_cfa)
   }
 
-  getSortedTracksAnalysis({ profile, tracks }: { profile: Record<AudioFeaturesProps, number>; tracks: Array<TrackAnalysisTrack> }) {
+  getSortedTracksAnalysis({
+    profile,
+    tracks,
+  }: {
+    profile: Record<AudioFeaturesProps, number>
+    tracks: Array<TrackAnalysisTrack>
+  }) {
     const request = {
       data: {
         profile,
@@ -81,8 +87,8 @@ export class CfaClient {
       },
       body: JSON.stringify(request),
     })
-      .then<Array<{ trackId: string, rownumbers: number }>>((res) => res.json())
-      .then((res) => res.map(item => item.trackId))
+      .then<Array<{ trackId: string; rownumbers: number }>>((res) => res.json())
+      .then((res) => res.map((item) => item.trackId))
   }
 
   mapAudioFeaturesToTrackAnalysis(
