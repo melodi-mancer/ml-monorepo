@@ -21,3 +21,28 @@ export const addOrRemoveFromArray = (item: string, array: Array<string>) => {
   }
   return [...array, item]
 }
+
+export const addOrRemoveObjectFromArray = <T, K extends keyof T>(
+  item: T,
+  array: Array<T>,
+  key: K
+) => {
+  const isInArray = array.some((a) => a[key] === item[key])
+  if (isInArray) {
+    return array.filter((a) => a[key] !== item[key])
+  }
+  return [...array, item]
+}
+
+export const mergeArraysOfObjects = <T, K extends keyof T>(
+  array1: Array<T>,
+  array2: Array<T>,
+  key: K
+): Array<T> => {
+  return array1.reduce((acc, item) => {
+    if (array2.some((a) => a[key] === item[key])) {
+      return acc
+    }
+    return [...acc, item]
+  }, array2)
+}

@@ -8,41 +8,26 @@ import type {
 } from '@spotify/web-api-ts-sdk'
 
 export interface RecommendationsState {
-  userSelectedSeed: SearchItem | null
-  adminSelectedSeeds: Array<SearchItem>
+  seeds: Array<SeedItem>
   useFactor: boolean
   threshold?: number
   factor?: TrackAnalysisColumns
-  tracksIds: Array<string>
-  artistsIds: Array<string>
   genres: Array<string>
   payload?: RecommendationsRequest
   recommendations: Array<Track>
   recommendationsAudioFeatures: Array<AudioFeatures>
 }
 
-type AdminSeedTypes = 'track' | 'artist' | 'genre'
+export type AdminSeedTypes = 'track' | 'artist' | 'genre'
 
-export type SeedTypes = 'userSelection' & AdminSeedTypes
-
-const seedMapping: Record<
-  AdminSeedTypes,
-  keyof Pick<RecommendationsState, 'tracksIds' | 'artistsIds' | 'genres'>
-> = {
-  track: 'tracksIds',
-  artist: 'artistsIds',
-  genre: 'genres',
-}
+export type SeedTypes = 'userSelection' | AdminSeedTypes
 
 const initialState: RecommendationsState = {
-  userSelectedSeed: null,
   // Admin functionality
-  adminSelectedSeeds: [],
+  seeds: [],
   useFactor: false,
   threshold: undefined,
   factor: undefined,
-  tracksIds: [],
-  artistsIds: [],
   genres: [],
   payload: undefined,
   recommendations: [],
@@ -90,22 +75,43 @@ export const useRecommendationsStore = defineStore('recommendations', {
       return (seedType: SeedTypes): RecommendationsRequestRequiredArguments => {
         switch (seedType) {
           case 'track':
-            return { seed_tracks: state[seedMapping[seedType]] }
+            return { seed_tracks: this.tracksIds }
           case 'artist':
-            return { seed_artists: state[seedMapping[seedType]] }
+            return { seed_artists: this.artistsIds }
           case 'genre':
-            return { seed_genres: state[seedMapping[seedType]] }
+            return { seed_genres: state.genres }
           case 'userSelection': {
+            if (Array.isArray(this.userSelectedSeed)) return {}
             const key =
-              state.userSelectedSeed?.itemType === 'track'
+              this.userSelectedSeed?.seedType === 'track'
                 ? 'seed_tracks'
                 : 'seed_artists'
-            return { [key]: [state.userSelectedSeed?.id] }
+            return { [key]: [this.userSelectedSeed?.id] }
           }
           default:
             return {}
         }
       }
+    },
+    userSelectedSeed(state): Array<SeedItem> | SeedItem | null {
+      const appSettings = useAppSettingsStore()
+      return appSettings.adminUi ? state.seeds : state.seeds[0] || null
+    },
+    tracksSeeds(state) {
+      return state.seeds.filter((seed) => seed.seedType === 'track')
+    },
+    artistsSeeds(state) {
+      return state.seeds.filter((seed) => seed.seedType === 'artist')
+    },
+    tracksIds(state) {
+      return state.seeds
+        .filter((seed) => seed.seedType === 'track')
+        .map((t) => t.id)
+    },
+    artistsIds(state) {
+      return state.seeds
+        .filter((seed) => seed.seedType === 'artist')
+        .map((t) => t.id)
     },
   },
   actions: {
@@ -128,19 +134,54 @@ export const useRecommendationsStore = defineStore('recommendations', {
         console.error(err)
       }
     },
-    setUserSelectedSeed(seed: SearchItem | null) {
-      this.userSelectedSeed = seed
-    },
-    // Admin functionality
-    updateSeed(seedType: AdminSeedTypes, items: Array<string> | string) {
-      if (Array.isArray(items)) {
-        this[seedMapping[seedType]] = items
+    updateSeed(
+      seedType: SeedTypes,
+      items: SeedItem | Array<SeedItem> | string | Array<string> | null
+    ) {
+      if (seedType === 'genre') {
+        this.updateGenres(items as string | Array<string>)
+      } else if (seedType === 'userSelection') {
+        this.setUserSelectedSeed(items as SeedItem | Array<SeedItem>)
       } else {
-        this[seedMapping[seedType]] = addOrRemoveFromArray(
-          items,
-          this[seedMapping[seedType]]
-        )
+        this.updateSeeds(items as SeedItem | Array<SeedItem>)
       }
+    },
+    setUserSelectedSeed(seed: Array<SeedItem> | SeedItem | null) {
+      if (Array.isArray(seed)) {
+        this.seeds = seed
+        return
+      }
+      if (!seed) {
+        this.seeds = []
+        return
+      }
+      this.seeds.push(seed)
+    },
+    updateSeeds(seed: Array<SeedItem> | SeedItem) {
+      let newSeeds: Array<SeedItem>
+      if (Array.isArray(seed)) {
+        newSeeds = seed
+      } else {
+        newSeeds = addOrRemoveObjectFromArray(seed, this.seeds, 'id')
+      }
+      const tackSeeds = newSeeds.filter((seed) => seed.seedType === 'track')
+      const artistSeeds = newSeeds.filter((seed) => seed.seedType === 'artist')
+      if (tackSeeds.length > 5 || artistSeeds.length > 5) {
+        throw new Error('You can only have 5 seeds of each type')
+      }
+      this.seeds = newSeeds
+    },
+    updateGenres(genres: Array<string> | string) {
+      let newGenres: Array<string>
+      if (Array.isArray(genres)) {
+        newGenres = genres
+      } else {
+        newGenres = addOrRemoveFromArray(genres, this.genres)
+      }
+      if (newGenres.length > 5) {
+        throw new Error('You can only have 5 genres')
+      }
+      this.genres = newGenres
     },
     updateFactors({
       useFactor,
@@ -152,7 +193,7 @@ export const useRecommendationsStore = defineStore('recommendations', {
       this.factor = factor
     },
     resetRecommendationOptions() {
-      this.userSelectedSeed = initialState.userSelectedSeed
+      this.seeds = initialState.seeds
       this.recommendations = initialState.recommendations
       this.recommendationsAudioFeatures =
         initialState.recommendationsAudioFeatures
@@ -160,8 +201,6 @@ export const useRecommendationsStore = defineStore('recommendations', {
       this.useFactor = initialState.useFactor
       this.threshold = initialState.threshold
       this.factor = initialState.factor
-      this.tracksIds = initialState.tracksIds
-      this.artistsIds = initialState.artistsIds
       this.genres = initialState.genres
     },
   },

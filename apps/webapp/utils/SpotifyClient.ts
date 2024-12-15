@@ -13,15 +13,15 @@ export type SpotifyTimeRanges =
   | 'long_term'
   | undefined
 
-type SearchTrack = {
-  itemType: 'track'
+type SeedTrack = {
+  seedType: 'track'
 } & Track
 
-type SearchArtist = {
-  itemType: 'artist'
+type SeedArtist = {
+  seedType: 'artist'
 } & Artist
 
-export type SearchItem = SearchTrack | SearchArtist
+export type SeedItem = SeedTrack | SeedArtist
 
 export class SpotifyClient {
   public client: SpotifyApi
@@ -130,19 +130,19 @@ export class SpotifyClient {
     return this.client.playlists.addItemsToPlaylist(playlistId, tracksUris)
   }
 
-  async searchTracksAndArtists(search: string): Promise<SearchItem[]> {
+  async searchTracksAndArtists(search: string): Promise<SeedItem[]> {
     const [tracksResult, artistsResult] = await Promise.all([
       this.client.search(`track:${search}`, ['track'], undefined, 5),
       this.client.search(`artist:${search}`, ['artist'], undefined, 5),
     ])
     const tracks = tracksResult.tracks.items.map((track) => ({
-      itemType: 'track',
+      seedType: 'track',
       ...track,
-    })) as SearchTrack[]
+    })) as SeedTrack[]
     const artists = artistsResult.artists.items.map((artist) => ({
-      itemType: 'artist',
+      seedType: 'artist',
       ...artist,
-    })) as SearchArtist[]
+    })) as SeedArtist[]
     return [...artists, ...tracks].filter((obj, index, arr) => {
       return (
         arr.findIndex((o) => {

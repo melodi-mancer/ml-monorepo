@@ -5,3 +5,9 @@ html {
   background-size: 50%;
   background-position: center;
 }
+
+.v-expansion-panel-text.no-iner-padding {
+  .v-expansion-panel-text__wrapper {
+    padding: 0;
+  }
+}

@@ -8,7 +8,8 @@ definePageMeta({
 })
 
 const isLoading = ref(false)
-const items = ref<SearchItem[]>([])
+const items = ref<SeedItem[]>([])
+const error = ref<string | null>(null)
 
 const search = (search: string) => {
   if (!search) {
@@ -26,11 +27,17 @@ const search = (search: string) => {
     })
 }
 
-const selectItem = (item: SearchItem) => {
-  if (appSettingsStore.adminUi) {
-    recommendationsStore.getSeedPayload(item)
-  } else {
-    recommendationsStore.setUserSelectedSeed(item)
+const selectItem = (
+  item: SeedItem | Array<SeedItem> | string | Array<string> | null,
+  seedType: SeedTypes = 'track'
+) => {
+  error.value = null
+  if (!appSettingsStore.adminUi) seedType = 'userSelection'
+  try {
+    recommendationsStore.updateSeed(seedType, item)
+  } catch (e) {
+    const err = e as Error
+    error.value = err.message
   }
 }
 
@@ -50,20 +57,23 @@ const confirmSelection = () => {
         density="default"
         clear-on-select
         hide-no-data
-        hide-details
+        :hide-details="!appSettingsStore.adminUi"
         clearable
         return-object
         prepend-inner-icon="mdi-magnify"
         single-line
         chips
+        :closable-chips="appSettingsStore.adminUi"
         item-value="id"
         item-title="name"
         :loading="isLoading"
         :items="items"
         :multiple="appSettingsStore.adminUi"
         :model-value="recommendationsStore.userSelectedSeed"
+        :error="error === null ? undefined : true"
+        :error-messages="error"
         @update:search="search"
-        @update:model-value="selectItem"
+        @update:model-value="(item) => selectItem(item)"
       >
         <template #chip="{ props, item }">
           <vChip
@@ -94,6 +104,10 @@ const confirmSelection = () => {
           multiple
           chips
           :items="['pop', 'rock', 'hip-hop', 'jazz', 'classical']"
+          :model-value="recommendationsStore.genres"
+          @update:model-value="
+            (item) => selectItem(item as Array<string>, 'genre')
+          "
         />
       </vCol>
     </ElIsAdmin>
