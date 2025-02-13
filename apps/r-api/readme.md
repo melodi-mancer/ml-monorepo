@@ -20,3 +20,8 @@ docker run -p 8000:8000 r-api:latest
 
 ## result
 http://206.81.18.129:8000/random_text?l=20
+
+# To publish your changes
+docker build --no-cache -t valentinkovalski/api:latest .
+docker push valentinkovalski/r-api:latest (it's a public repo at the moment)
+redeploy on digital ocean(go to the website/actions/force rebuild and redeploy)
