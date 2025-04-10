@@ -17,9 +17,7 @@ export interface RecommendationsState {
   recommendationsAudioFeatures: Array<AudioFeatures>
 }
 
-export type AdminSeedTypes = 'track' | 'artist'
-
-export type SeedTypes = 'userSelection' | AdminSeedTypes
+export type SeedTypes = 'track' | 'artist'
 
 const initialState: RecommendationsState = {
   // Admin functionality
@@ -37,6 +35,12 @@ export const useRecommendationsStore = defineStore('recommendations', {
     ...initialState,
   }),
   getters: {
+    availableSeedTypes(state): Array<SeedTypes> {
+      return [...new Set(state.seeds.map((seed) => seed.seedType))]
+    },
+    isSeedEmpty(state): boolean {
+      return state.seeds.length === 0
+    },
     getRecommendationsWithAudioFeatures(state) {
       return state.recommendations.map((track) => {
         const audioFeatures = state.recommendationsAudioFeatures.find(
@@ -76,14 +80,6 @@ export const useRecommendationsStore = defineStore('recommendations', {
             return { seed_tracks: this.tracksIds }
           case 'artist':
             return { seed_artists: this.artistsIds }
-          case 'userSelection': {
-            if (Array.isArray(this.userSelectedSeed)) return {}
-            const key =
-              this.userSelectedSeed?.seedType === 'track'
-                ? 'seed_tracks'
-                : 'seed_artists'
-            return { [key]: [this.userSelectedSeed?.id] }
-          }
           default:
             return {}
         }
@@ -130,32 +126,14 @@ export const useRecommendationsStore = defineStore('recommendations', {
         console.error(err)
       }
     },
-    updateSeed(
-      seedType: SeedTypes,
-      items: SeedItem | Array<SeedItem> | string | Array<string> | null
-    ) {
-      if (seedType === 'userSelection') {
-        this.setUserSelectedSeed(items as SeedItem | Array<SeedItem>)
-      } else {
-        this.updateSeeds(items as SeedItem | Array<SeedItem>)
-      }
-    },
-    setUserSelectedSeed(seed: Array<SeedItem> | SeedItem | null) {
-      if (Array.isArray(seed)) {
-        this.seeds = seed
-        return
-      }
-      this.seeds = []
-      if (seed) {
-        this.seeds.push(seed)
-      }
-    },
-    updateSeeds(seed: Array<SeedItem> | SeedItem) {
+    updateSeed(items: SeedItem | Array<SeedItem> | null) {
       let newSeeds: Array<SeedItem>
-      if (Array.isArray(seed)) {
-        newSeeds = seed
+      if (Array.isArray(items)) {
+        newSeeds = items
+      } else if (!items) {
+        newSeeds = []
       } else {
-        newSeeds = addOrRemoveObjectFromArray(seed, this.seeds, 'id')
+        newSeeds = [items]
       }
       const tackSeeds = newSeeds.filter((seed) => seed.seedType === 'track')
       const artistSeeds = newSeeds.filter((seed) => seed.seedType === 'artist')
