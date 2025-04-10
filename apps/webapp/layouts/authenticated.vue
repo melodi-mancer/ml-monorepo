@@ -12,7 +12,6 @@ const toggleDrawer = () => (drawer.value = !drawer.value)
     <vListItem
       prepend-avatar="/icon/newicon.svg"
       title="Melodimancer"
-      subtitle="v0.0.0"
       class="py-4"
     />
 
