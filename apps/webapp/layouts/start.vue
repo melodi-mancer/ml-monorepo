@@ -4,10 +4,7 @@ provide('layout', 'start')
 </script>
 
 <template>
-  <vApp>
-    <!-- Include the Header component, but hide logout button for non-authenticated pages -->
-    <ModuleHeader :showLogoutButton="false" />
-    
+  <vApp>    
     <!-- Main content area -->
     <vMain>
       <vContainer height="100%">

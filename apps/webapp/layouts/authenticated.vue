@@ -7,6 +7,8 @@ provide('layout', 'authenticated')
 
 const drawer = ref(false)
 const toggleDrawer = () => (drawer.value = !drawer.value)
+const config = useRuntimeConfig()
+
 </script>
 <template>
   <vApp>
@@ -15,7 +17,7 @@ const toggleDrawer = () => (drawer.value = !drawer.value)
       <vListItem
         prepend-avatar="/icon/newicon.svg"
         title="Melodimancer"
-        subtitle="v0.0.0"
+        :subtitle="`v${config.public.appVersion}`"
         class="py-4"
       />
 

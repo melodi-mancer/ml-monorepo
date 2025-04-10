@@ -11,10 +11,7 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
-  showLogoutButton: {
-    type: Boolean,
-    default: true
-  },
+
   pageTitle: {
     type: String,
     default: ''
@@ -80,17 +77,6 @@ function handleGoBack() {
     
     <!-- Right side elements (version and logout) -->
     <template #append>
-      <div class="d-flex align-center">
-        <span class="text-caption me-4">v{{ version }}</span>
-        <vBtn 
-          v-if="showLogoutButton"
-          icon
-          @click="handleLogoutClick"
-          title="Log out"
-        >
-          <vIcon>mdi-logout</vIcon>
-        </vBtn>
-      </div>
     </template>
   </vAppBar>
 </template>
