@@ -1,4 +1,5 @@
 <script setup>
+import ModuleHeader from '~/components/2.modules/Header/Header.vue'
 provide('layout', 'subpage')
 
 const title = ref('')
@@ -16,17 +17,18 @@ const goBack = () => {
 </script>
 
 <template>
-  <vAppBar app :elevation="0">
-    <template #prepend>
-      <vBtn icon @click="goBack">
-        <vIcon> mdi-arrow-left </vIcon>
-      </vBtn>
-      <vAppBarTitle v-if="title">{{ title }}</vAppBarTitle>
-    </template>
-  </vAppBar>
-  <vMain>
-    <vContainer>
-      <slot />
-    </vContainer>
-  </vMain>
+  <vApp>
+    <!-- Use ModuleHeader with back button and dynamic title -->
+    <ModuleHeader
+      :showBackButton="true"
+      :pageTitle="title"
+      @go-back="goBack"
+    />
+    
+    <vMain>
+      <vContainer>
+        <slot />
+      </vContainer>
+    </vMain>
+  </vApp>
 </template>

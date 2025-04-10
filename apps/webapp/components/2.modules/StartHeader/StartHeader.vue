@@ -13,8 +13,6 @@ const version = config.public.appVersion
       <div class="logo"></div>
       <h1>Melodimancer</h1>
     </div>
-    <div class="secondary">
-      <small>v{{ version }}</small>
-    </div>
+
   </div>
 </template>

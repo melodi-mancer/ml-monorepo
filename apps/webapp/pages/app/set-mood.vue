@@ -13,13 +13,15 @@ const artists = ref<Array<string>>([...recommendationsStore.artistsIds])
 const genres = ref<Array<string>>([...recommendationsStore.genres])
 const threshold = ref(0)
 
-onBeforeMount(() => {
-  setTitle?.('Set Mood')
-})
 </script>
 
 <template>
   <vRow class="pb-14">
+    <!-- Page Title -->
+    <vCol cols="12" class="mb-4">
+      <h5 class="text-h4 font-weight-bold text-center">mood title goes here </h5>
+    </vCol>
+    
     <ElIsAdmin>
       <template #fallback>
         <vCol
