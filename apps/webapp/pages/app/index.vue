@@ -1,8 +1,10 @@
 <script setup lang="ts">
+
 import { getImage, getSubtitle } from '#build/imports'
 const nuxt = useNuxtApp()
 const recommendationsStore = useRecommendationsStore()
 const appSettingsStore = useAppSettingsStore()
+
 definePageMeta({
   layout: 'authenticated',
 })

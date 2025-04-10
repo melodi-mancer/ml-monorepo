@@ -1,18 +1,14 @@
 #TODO:
-#Authentication
+# Authentication: https://www.rplumber.io/articles/security.html
+# Load balancing with faucet : https://github.com/ixpantia/faucet/blob/main/README.md
 
-#create 3rd endpoint
-#receive pool based on seeds + profile (which parameters used for target)
-#So profile + tracks with 
-#determine averages for targets
-#rank per row on how close they are to targets
-#sort
-#return ordered list of IDs
-
-# TO DISCUSS
-# Output of endpoint 2 now excludes the 100 / -100 /0 columns
-# It's information about positive or negative factor loadings, but turns out we don't care so omit?
-
+# popularity endpoint idea:
+{
+# receive an extra column with artist and/or track popularity
+# analyze as factor?
+# use as sorting algo for adventurousness button
+# 
+}
 
 #Run packages
 {
@@ -29,7 +25,7 @@
   #library(gridExtra)
   #library(spotifyr)
 }
-#Run custom functions
+#Run custom functions F1, F2, F3, F3_1
 {
   # F1 turn json into R DF
   F1_json_df <- function(input_data) {
@@ -40,6 +36,7 @@
   # F2 turns F1 output into a list containing a summary statistics
   # as an R table (summary_table)
   F2_summary_table <- function(df1) {
+    # empty DF to take data
     summary_table <- data.frame(
       component = character(),
       median = numeric(),
@@ -61,6 +58,9 @@
       stringsAsFactors = FALSE
     )
     
+    # iterate over each component_name as a column to calculate values as rows
+    # required_audio_features is taken from 'Reference models for the API requests'
+    # which is one of the frames defined after these functions are
     for (component_name in names(required_audio_features)) {
       column <- df1[[component_name]]
       column_median <- median(column, na.rm = TRUE)
@@ -80,6 +80,7 @@
       column_q3high20pc <- column_q3 * 1.2
       column_q3high10pc <- column_q3 * 1.1
 
+      # after calculation and assignment to objects, turn into list
       new_row <- list(
         component = component_name,
         median = column_median,
@@ -100,24 +101,30 @@
         q3_high_10pc = column_q3high10pc
       )
 
+      # bind up all the new_row iterations into a table
       summary_table <- rbind(summary_table, new_row, stringsAsFactors = FALSE)
     }
 
     return(summary_table)
   }
   
-  # F3 turns JSON into ...
+  # F3 turns JSON into list of PCA analysis and Profile
   F3_factor_analysis_varimax <- function(df1) {
-    #keep only these columns
+    # keep only these columns as defined in required_audio_features
+    # required_audio_features is defined under 
     component_names <- names(required_audio_features)
-
-    df1 <- df1 %>% #drop columns
-      select(one_of(component_names))
-    
+  
+    # keep only columns that exist as names in component_names
+    # component_names is defined under #Reference models for the API requests
+    df1 <- df1 %>% select(one_of(component_names))
+    # drop columns not defined in component_names
     Clusters1 <- df1[, component_names]
     CORClusters1 <- cor(Clusters1, use = "complete.obs")
     
     # Perform factor analysis
+    # varimax: to simplify the structure of the loadings matrix
+    # aims to make the loadings for each variable either very high or very low
+    # in a single factor while keeping them close to zero in all other factors
     # Turned off plot with plot=FALSE
     FA <- fa.parallel(CORClusters1, n.obs = nrow(Clusters1), plot=FALSE)
     PCA1 <- principal(CORClusters1, nfactors = FA$nfact, rotate = "varimax", scores = TRUE)
@@ -152,8 +159,6 @@
       )
     }
     
-    # 
-    
     # Use quick function to add columns with Q1 or Q3 values to be sent to Spotify API
     Profile1 <- Profile1 %>%
       mutate(across(everything(), ~ mutate_profile1(.x, summary_table$q1, summary_table$q3), .names = "new_{.col}"))
@@ -166,9 +171,79 @@
     
     return(list(PCA1 = PCA1, profile = Profile1))
   }
+
+  # F3_1 optimzed F3 that return Profile
+  F3_1_factor_analysis_varimax <- function(df1) {
+  #F3_1 performance improvements:
+    # base-r to replace tidyverse
+    # removed some minor redundancies
+    # return only profile dataframe
+  
+    # keep only these columns as defined in required_audio_features
+    component_names <- names(required_audio_features)
+  
+  # keep only columns that exist as names in component_names
+  # component_names is defined under #Reference models for the API requests
+    
+    # Match column names case-insensitively
+    matched_cols <- colnames(df1)[tolower(colnames(df1)) %in% tolower(component_names)]
+    
+    # Convert matched column names to lowercase in the data frame
+    colnames(df1)[tolower(colnames(df1)) %in% tolower(component_names)] <- tolower(matched_cols)
+    
+    # Subset the data frame using the matched column names
+    df1 <- df1[, tolower(component_names), drop = FALSE]
+    
+    # Create correlation matrix
+    CORClusters1 <- cor(df1, use = "complete.obs")
+    
+  # Perform factor analysis
+  # varimax: to simplify the structure of the loadings matrix
+  # aims to make the loadings for each variable either very high or very low
+  # in a single factor while keeping them close to zero in all other factors
+
+    # only produce the recommended number of factors
+    nfact <- fa.parallel(CORClusters1, n.obs = nrow(Clusters1), plot = FALSE)$nfact
+    PCA1 <- principal(CORClusters1, nfactors = nfact, rotate = "varimax", scores = TRUE)
+    
+    # Convert loadings to a data frame
+    Profile1 <- PCA1$loadings
+    
+    # Cut off anything below "Valence" row
+    Profile1 <- Profile1[1:which(trimws(rownames(PCA1$loadings)) == "valence"), , drop = FALSE]
+    Profile1 <- as.data.frame(Profile1)
+    
+    # Apply the transformation to all columns of Profile1
+    Profile1[] <- apply(Profile1, 2, function(x) {
+      ifelse(x < -0.39, -100,    #-100 for negative + 'significant' correlation
+      ifelse(x > 0.39, 100, 0))  # 100 for positive + 'significant' correlation
+    })
+    
+    # Run Summary table function to get profile values as table
+    summary_table <- F2_summary_table(df1)
+    summary_table <- summary_table[, c("component", "q1", "q3")]
+    
+    mutate_profile1 <- function(value, q1, q3) {
+      ifelse(value == 0, NA_real_,
+             ifelse(value == -100, q1,
+                    ifelse(value == 100, q3, value)))
+    }
+    
+    # Apply the mutate_profile1 function to each column in Profile1
+    Profile1_new <- Profile1
+    for (col in colnames(Profile1)) {
+      Profile1_new[[paste0("new_", col)]] <- mapply(mutate_profile1, Profile1[[col]], 
+                                                     MoreArgs = list(q1 = summary_table$q1, q3 = summary_table$q3))
+    }
+    
+    # Subset the new columns that contain "new_"
+    Profile1_new <- Profile1_new[, grep("new_", colnames(Profile1_new))]
+
+    return(list(profile = Profile1_new))
+  }
   
 }
-#API endpoint 3
+#API endpoint 3: Z-score to order the list
 {
   F4_FactorNameNumberExtractor <- function(data) {
   # Convert list to data frame
@@ -341,6 +416,18 @@ function(audio_features = required_audio_features) {
 function(audio_features = required_audio_features) {
   result <- F1_json_df(audio_features)
   profile_cfa <- F3_factor_analysis_varimax(result)
+  # create the response model
+  list(profile_cfa = profile_cfa$profile)
+}
+
+#* @post /cfa_1
+#* Optimzed .1 version. Profile through CFA analysis based on Spotify audio features
+#* @param audio_features:[object]
+#* @tag Analysis
+#* @serializer json
+function(audio_features = required_audio_features) {
+  result <- F1_json_df(audio_features)
+  profile_cfa <- F3_1_factor_analysis_varimax(result)
   # create the response model
   list(profile_cfa = profile_cfa$profile)
 }
