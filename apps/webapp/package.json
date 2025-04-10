@@ -1,10 +1,11 @@
 {
   "name": "@melodimancer/webapp",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
     "build": "nuxt build",
+    "start": "nuxt start",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",

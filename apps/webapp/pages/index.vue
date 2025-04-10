@@ -26,7 +26,6 @@ definePageMeta({
         </vCol>
         <vCol cols="12">
           <h1 class="text-center my-0">Melodimancer</h1>
-          <small class="text-center d-block mb-10">v{{ version }}</small>
         </vCol>
       </vRow>
     </vCol>
