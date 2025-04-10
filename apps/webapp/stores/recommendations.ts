@@ -12,13 +12,12 @@ export interface RecommendationsState {
   useFactor: boolean
   threshold?: number
   factor?: TrackAnalysisColumns
-  genres: Array<string>
   payload?: RecommendationsRequest
   recommendations: Array<Track>
   recommendationsAudioFeatures: Array<AudioFeatures>
 }
 
-export type AdminSeedTypes = 'track' | 'artist' | 'genre'
+export type AdminSeedTypes = 'track' | 'artist'
 
 export type SeedTypes = 'userSelection' | AdminSeedTypes
 
@@ -28,7 +27,6 @@ const initialState: RecommendationsState = {
   useFactor: false,
   threshold: undefined,
   factor: undefined,
-  genres: [],
   payload: undefined,
   recommendations: [],
   recommendationsAudioFeatures: [],
@@ -71,15 +69,13 @@ export const useRecommendationsStore = defineStore('recommendations', {
         }
       }, {} as RecommendationsRequest)
     },
-    getSeedPayload(state) {
+    getSeedPayload() {
       return (seedType: SeedTypes): RecommendationsRequestRequiredArguments => {
         switch (seedType) {
           case 'track':
             return { seed_tracks: this.tracksIds }
           case 'artist':
             return { seed_artists: this.artistsIds }
-          case 'genre':
-            return { seed_genres: state.genres }
           case 'userSelection': {
             if (Array.isArray(this.userSelectedSeed)) return {}
             const key =
@@ -138,9 +134,7 @@ export const useRecommendationsStore = defineStore('recommendations', {
       seedType: SeedTypes,
       items: SeedItem | Array<SeedItem> | string | Array<string> | null
     ) {
-      if (seedType === 'genre') {
-        this.updateGenres(items as string | Array<string>)
-      } else if (seedType === 'userSelection') {
+      if (seedType === 'userSelection') {
         this.setUserSelectedSeed(items as SeedItem | Array<SeedItem>)
       } else {
         this.updateSeeds(items as SeedItem | Array<SeedItem>)
@@ -151,11 +145,10 @@ export const useRecommendationsStore = defineStore('recommendations', {
         this.seeds = seed
         return
       }
-      if (!seed) {
-        this.seeds = []
-        return
+      this.seeds = []
+      if (seed) {
+        this.seeds.push(seed)
       }
-      this.seeds.push(seed)
     },
     updateSeeds(seed: Array<SeedItem> | SeedItem) {
       let newSeeds: Array<SeedItem>
@@ -170,18 +163,6 @@ export const useRecommendationsStore = defineStore('recommendations', {
         throw new Error('You can only have 5 seeds of each type')
       }
       this.seeds = newSeeds
-    },
-    updateGenres(genres: Array<string> | string) {
-      let newGenres: Array<string>
-      if (Array.isArray(genres)) {
-        newGenres = genres
-      } else {
-        newGenres = addOrRemoveFromArray(genres, this.genres)
-      }
-      if (newGenres.length > 5) {
-        throw new Error('You can only have 5 genres')
-      }
-      this.genres = newGenres
     },
     updateFactors({
       useFactor,
@@ -201,7 +182,6 @@ export const useRecommendationsStore = defineStore('recommendations', {
       this.useFactor = initialState.useFactor
       this.threshold = initialState.threshold
       this.factor = initialState.factor
-      this.genres = initialState.genres
     },
   },
   persist: {

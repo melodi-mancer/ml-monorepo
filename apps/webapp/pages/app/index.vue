@@ -57,7 +57,7 @@ const confirmSelection = () => {
         density="default"
         clear-on-select
         hide-no-data
-        :hide-details="!appSettingsStore.adminUi"
+        hide-details
         clearable
         return-object
         prepend-inner-icon="mdi-magnify"
@@ -94,23 +94,6 @@ const confirmSelection = () => {
         </template>
       </vAutocomplete>
     </vCol>
-    <ElIsAdmin>
-      <vCol cols="12">
-        <vCombobox
-          placeholder="Try out some genres"
-          variant="outlined"
-          hide-details
-          density="default"
-          multiple
-          chips
-          :items="['pop', 'rock', 'hip-hop', 'jazz', 'classical']"
-          :model-value="recommendationsStore.genres"
-          @update:model-value="
-            (item) => selectItem(item as Array<string>, 'genre')
-          "
-        />
-      </vCol>
-    </ElIsAdmin>
     <vCol cols="12">
       <vBtn
         text="Confirm"
