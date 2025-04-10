@@ -44,17 +44,14 @@ const config = useRuntimeConfig()
         <!-- Information section: About and Legal -->
         <vListItem 
           prepend-icon="mdi-information-outline" 
+          to="/app/about"
           title="About" 
           value="about" 
         />
         <vListItem 
-          prepend-icon="mdi-file-document-outline" 
-          title="Terms of use" 
-          value="terms-of-use" 
-        />
-        <vListItem 
           prepend-icon="mdi-shield-account-outline" 
-          title="Privacy Settings" 
+          to="/app/privacy"
+          title="Privacy" 
           value="privacy" 
         />
       </vList>
