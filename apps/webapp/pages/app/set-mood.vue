@@ -6,21 +6,19 @@ definePageMeta({
   layout: 'subpage',
 })
 const minutes = ref(25)
-const setTitle = inject<(arg: string) => void>('setTitle')
 const seedType = ref(recommendationsStore.availableSeedTypes)
 const tracks = ref<Array<string>>([...recommendationsStore.tracksIds])
 const artists = ref<Array<string>>([...recommendationsStore.artistsIds])
 const threshold = ref(0)
-
 </script>
 
 <template>
   <vRow class="pb-14">
     <!-- Page Title -->
     <vCol cols="12" class="mb-4">
-      <h5 class="text-h4 font-weight-bold text-center">mood title goes here </h5>
+      <h5 class="text-h4 font-weight-bold text-center">mood title goes here</h5>
     </vCol>
-    
+
     <ElIsAdmin>
       <template #fallback>
         <vCol
