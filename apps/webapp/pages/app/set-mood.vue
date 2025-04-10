@@ -6,22 +6,19 @@ definePageMeta({
   layout: 'subpage',
 })
 const minutes = ref(25)
-const setTitle = inject<(arg: string) => void>('setTitle')
-const seedType = ref('track')
+const seedType = ref(recommendationsStore.availableSeedTypes)
 const tracks = ref<Array<string>>([...recommendationsStore.tracksIds])
 const artists = ref<Array<string>>([...recommendationsStore.artistsIds])
-const genres = ref<Array<string>>([...recommendationsStore.genres])
 const threshold = ref(0)
-
 </script>
 
 <template>
   <vRow class="pb-14">
     <!-- Page Title -->
     <vCol cols="12" class="mb-4">
-      <h5 class="text-h4 font-weight-bold text-center">mood title goes here </h5>
+      <h5 class="text-h4 font-weight-bold text-center">mood title goes here</h5>
     </vCol>
-    
+
     <ElIsAdmin>
       <template #fallback>
         <vCol
@@ -50,16 +47,24 @@ const threshold = ref(0)
         </vCol>
       </template>
       <vCol cols="12">
-        <span class="font-weight-black">Based on {{ seedType }}</span>
-        <vExpansionPanels v-model="seedType" variant="accordion" mandatory>
+        <span class="font-weight-black"
+          >Based on {{ seedType.join(' and ') }}</span
+        >
+        <vExpansionPanels
+          v-model="seedType"
+          variant="accordion"
+          mandatory
+          multiple
+        >
           <vExpansionPanel
+            v-if="recommendationsStore.availableSeedTypes.includes('track')"
             value="track"
-            :color="seedType === 'track' ? 'primary' : undefined"
+            :color="seedType.includes('track') ? 'primary' : undefined"
           >
             <vExpansionPanelTitle>
               Tracks
               <template #actions>
-                <vRadio :model-value="seedType === 'track'" />
+                <vCheckbox :model-value="seedType.includes('track')" />
               </template>
             </vExpansionPanelTitle>
             <vExpansionPanelText class="no-iner-padding">
@@ -93,13 +98,14 @@ const threshold = ref(0)
             </vExpansionPanelText>
           </vExpansionPanel>
           <vExpansionPanel
+            v-if="recommendationsStore.availableSeedTypes.includes('artist')"
             value="artist"
-            :color="seedType === 'artist' ? 'primary' : undefined"
+            :color="seedType.includes('artist') ? 'primary' : undefined"
           >
             <vExpansionPanelTitle>
               Artists
               <template #actions>
-                <vRadio :model-value="seedType === 'artist'" />
+                <vCheckbox :model-value="seedType.includes('artist')" />
               </template>
             </vExpansionPanelTitle>
             <vExpansionPanelText class="no-iner-padding">
@@ -121,43 +127,6 @@ const threshold = ref(0)
                       <template #prepend>
                         <vCheckbox
                           :model-value="artists.includes(artist.id)"
-                          hide-details
-                        />
-                      </template>
-                    </vListItem>
-                  </vList>
-                </vCol>
-              </vRow>
-            </vExpansionPanelText>
-          </vExpansionPanel>
-          <vExpansionPanel
-            value="genre"
-            :color="seedType === 'genre' ? 'primary' : undefined"
-          >
-            <vExpansionPanelTitle>
-              Genres
-              <template #actions>
-                <vRadio :model-value="seedType === 'genre'" />
-              </template>
-            </vExpansionPanelTitle>
-            <vExpansionPanelText class="no-iner-padding">
-              <vRow no-gutters>
-                <vCol cols="12">
-                  <vList density="compact" class="pa-0">
-                    <vListItem
-                      v-for="genre in recommendationsStore.genres"
-                      :key="genre"
-                      :title="genre"
-                      class="pa-0"
-                      @click="
-                        genres.includes(genre)
-                          ? genres.splice(genres.indexOf(genre), 1)
-                          : genres.push(genre)
-                      "
-                    >
-                      <template #prepend>
-                        <vCheckbox
-                          :model-value="genres.includes(genre)"
                           hide-details
                         />
                       </template>

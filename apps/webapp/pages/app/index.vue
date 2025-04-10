@@ -29,14 +29,10 @@ const search = (search: string) => {
     })
 }
 
-const selectItem = (
-  item: SeedItem | Array<SeedItem> | string | Array<string> | null,
-  seedType: SeedTypes = 'track'
-) => {
+const selectItem = (item: SeedItem | Array<SeedItem> | null) => {
   error.value = null
-  if (!appSettingsStore.adminUi) seedType = 'userSelection'
   try {
-    recommendationsStore.updateSeed(seedType, item)
+    recommendationsStore.updateSeed(item)
   } catch (e) {
     const err = e as Error
     error.value = err.message
@@ -100,7 +96,7 @@ const confirmSelection = () => {
       <vBtn
         text="Confirm"
         block
-        :disabled="!recommendationsStore.userSelectedSeed"
+        :disabled="recommendationsStore.isSeedEmpty"
         @click="confirmSelection"
       />
     </vCol>
