@@ -14,7 +14,7 @@ const genres = ref<Array<string>>([...recommendationsStore.genres])
 const threshold = ref(0)
 
 onBeforeMount(() => {
-  setTitle?.('Set Mood')
+ // setTitle?.('Set Mood')
 })
 </script>
 
